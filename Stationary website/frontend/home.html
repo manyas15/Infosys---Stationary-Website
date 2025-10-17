@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Stationery App - Home</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">Stationery App</div>
+    <div class="spacer"></div>
+    <div id="userBox"></div>
+    <button id="logoutBtn" class="danger">Logout</button>
+  </header>
+
+  <main class="container">
+    <h2>Home</h2>
+    <div class="grid buttons">
+      <a class="btn" href="add.html">Add</a>
+      <a class="btn" href="get.html">Get</a>
+      <a class="btn" href="update.html">Update</a>
+      <a class="btn danger" href="delete.html">Delete</a>
+    </div>
+
+    <section class="card">
+      <h3>Sample Items</h3>
+      <div id="items" class="grid list"></div>
+    </section>
+  </main>
+
+  <script src="js/api.js"></script>
+  <script src="js/auth.js"></script>
+  <script>
+    guardAuth();
+    const user = getCurrentUser();
+    document.getElementById('userBox').textContent = user ? user.name : '';
+    document.getElementById('logoutBtn').onclick = () => { logout(); location.href = 'index.html'; };
+    (async function load() {
+      const data = await apiGet('/api/items');
+      const box = document.getElementById('items');
+      box.innerHTML = '';
+      data.items.forEach(it => {
+        const div = document.createElement('div');
+        div.className = 'item';
+        div.innerHTML = `<strong>${it.name}</strong><br><small>${it.category}</small><br>Qty: ${it.quantity} | ₹${it.price}`;
+        box.appendChild(div);
+      });
+    })();
+  </script>
+</body>
+</html>
+
+
