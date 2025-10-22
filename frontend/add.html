@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Stationery App - Add Product</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+  <div class="background-animation"></div>
+  
+  <header class="topbar">
+    <div class="brand">
+      <i class="fas fa-store"></i>
+      Stationery Store
+    </div>
+    <div class="spacer"></div>
+    <div id="userBox" class="user-info"></div>
+    <button id="logoutBtn" class="danger">
+      <i class="fas fa-sign-out-alt"></i>
+      Logout
+    </button>
+  </header>
+
+  <main class="container">
+    <div class="page-header">
+      <h1>
+        <i class="fas fa-plus-circle"></i>
+        Add New Product
+      </h1>
+      <p>Fill in the details to add a new product to your inventory</p>
+    </div>
+
+    <div class="form-container">
+      <div class="card form-card">
+        <form id="addForm" class="product-form">
+          <div class="form-group">
+            <label for="name">
+              <i class="fas fa-tag"></i>
+              Product Name *
+            </label>
+            <input type="text" id="name" name="name" required placeholder="Enter product name" />
+          </div>
+
+          <div class="form-group">
+            <label for="details">
+              <i class="fas fa-info-circle"></i>
+              Product Details *
+            </label>
+            <textarea id="details" name="details" required placeholder="Enter product description and details" rows="4"></textarea>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="price">
+                <i class="fas fa-rupee-sign"></i>
+                Price *
+              </label>
+              <input type="number" id="price" name="price" min="0" step="0.01" required placeholder="0.00" />
+            </div>
+
+            <div class="form-group">
+              <label for="category">
+                <i class="fas fa-folder"></i>
+                Category
+              </label>
+              <select id="category" name="category">
+                <option value="general">General</option>
+                <option value="pen">Pen</option>
+                <option value="pencil">Pencil</option>
+                <option value="book">Book</option>
+                <option value="copy">Copy</option>
+                <option value="eraser">Eraser</option>
+                <option value="sharpener">Sharpener</option>
+                <option value="ruler">Ruler</option>
+                <option value="calculator">Calculator</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="quantity">
+                <i class="fas fa-boxes"></i>
+                Quantity
+              </label>
+              <input type="number" id="quantity" name="quantity" min="0" value="0" placeholder="0" />
+            </div>
+
+            <div class="form-group">
+              <label for="image">
+                <i class="fas fa-image"></i>
+                Image URL
+              </label>
+              <input type="url" id="image" name="image" placeholder="https://example.com/image.jpg" />
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button type="submit" class="submit-btn">
+              <i class="fas fa-plus"></i>
+              Add Product
+            </button>
+            <a href="home.html" class="cancel-btn">
+              <i class="fas fa-arrow-left"></i>
+              Back to Home
+            </a>
+          </div>
+        </form>
+        
+        <div id="msg" class="msg"></div>
+      </div>
+
+      <div class="preview-card">
+        <h3>
+          <i class="fas fa-eye"></i>
+          Product Preview
+        </h3>
+        <div id="preview" class="product-preview">
+          <div class="preview-placeholder">
+            <i class="fas fa-image"></i>
+            <p>Product preview will appear here</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="js/api.js"></script>
+  <script src="js/auth.js"></script>
+  <script>
+    guardAuth();
+    const user = getCurrentUser();
+    document.getElementById('userBox').innerHTML = user ? 
+      `<i class="fas fa-user"></i> Welcome, ${user.name}` : '';
+    document.getElementById('logoutBtn').onclick = () => { logout(); location.href = 'index.html'; };
+
+    // Live preview functionality
+    function updatePreview() {
+      const name = document.getElementById('name').value;
+      const details = document.getElementById('details').value;
+      const price = document.getElementById('price').value;
+      const category = document.getElementById('category').value;
+      const quantity = document.getElementById('quantity').value;
+      const image = document.getElementById('image').value;
+      
+      const preview = document.getElementById('preview');
+      
+      if (!name && !details && !price) {
+        preview.innerHTML = `
+          <div class="preview-placeholder">
+            <i class="fas fa-image"></i>
+            <p>Product preview will appear here</p>
+          </div>
+        `;
+        return;
+      }
+      
+      preview.innerHTML = `
+        <div class="preview-item">
+          <div class="preview-image">
+            ${image ? `<img src="${image}" alt="${name}" onerror="this.style.display='none'">` : '<i class="fas fa-image"></i>'}
+          </div>
+          <div class="preview-content">
+            <h4>${name || 'Product Name'}</h4>
+            <p class="preview-details">${details || 'Product details will appear here'}</p>
+            <div class="preview-meta">
+              <span class="preview-category"><i class="fas fa-tag"></i> ${category}</span>
+              <span class="preview-quantity"><i class="fas fa-boxes"></i> ${quantity || '0'}</span>
+              <span class="preview-price"><i class="fas fa-rupee-sign"></i> ${price || '0.00'}</span>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    // Add event listeners for live preview
+    ['name', 'details', 'price', 'category', 'quantity', 'image'].forEach(id => {
+      document.getElementById(id).addEventListener('input', updatePreview);
+    });
+
+    // Form submission
+    document.getElementById('addForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const msg = document.getElementById('msg');
+      msg.textContent = '';
+      
+      const body = {
+        name: document.getElementById('name').value.trim(),
+        details: document.getElementById('details').value.trim(),
+        price: Number(document.getElementById('price').value),
+        category: document.getElementById('category').value,
+        quantity: Number(document.getElementById('quantity').value) || 0,
+        image: document.getElementById('image').value.trim(),
+      };
+      
+      if (!body.name || !body.details || !body.price) {
+        msg.textContent = 'Please fill in all required fields';
+        msg.className = 'msg error';
+        return;
+      }
+      
+      try {
+        msg.textContent = 'Adding product...';
+        msg.className = 'msg info';
+        
+        await apiPost('/api/items', body);
+        msg.textContent = 'Product added successfully!';
+        msg.className = 'msg success';
+        
+        // Reset form
+        document.getElementById('addForm').reset();
+        updatePreview();
+        
+        // Redirect after 2 seconds
+        setTimeout(() => {
+          location.href = 'home.html';
+        }, 2000);
+        
+      } catch (err) {
+        msg.textContent = err.message || 'Failed to add product';
+        msg.className = 'msg error';
+      }
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,70 @@
+[
+  {
+    "id": "seed-pen-1",
+    "name": "Premium Ball Pen",
+    "details": "High-quality ball pen with smooth writing experience. Perfect for office and school use. Available in blue ink.",
+    "category": "pen",
+    "quantity": 50,
+    "price": 15.99,
+    "image": "https://images.unsplash.com/photo-1583394838336-acd977736f90?w=300&h=300&fit=crop",
+    "createdAt": "2025-01-01T00:00:00.000Z",
+    "updatedAt": "2025-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "seed-pencil-1",
+    "name": "HB Graphite Pencil",
+    "details": "Standard HB pencil with high-quality graphite core. Ideal for writing, drawing, and sketching. Includes eraser cap.",
+    "category": "pencil",
+    "quantity": 100,
+    "price": 8.50,
+    "image": "https://images.unsplash.com/photo-1513475382585-d06e58bcb0e0?w=300&h=300&fit=crop",
+    "createdAt": "2025-01-01T00:00:00.000Z",
+    "updatedAt": "2025-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "seed-book-1",
+    "name": "Mathematics Textbook",
+    "details": "Comprehensive mathematics textbook covering algebra, geometry, and calculus. Suitable for high school students.",
+    "category": "book",
+    "quantity": 20,
+    "price": 125.00,
+    "image": "https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=300&h=300&fit=crop",
+    "createdAt": "2025-01-01T00:00:00.000Z",
+    "updatedAt": "2025-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "seed-copy-1",
+    "name": "Spiral Notebook",
+    "details": "200-page spiral bound notebook with ruled pages. Perfect for taking notes in class or meetings.",
+    "category": "copy",
+    "quantity": 60,
+    "price": 35.00,
+    "image": "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=300&h=300&fit=crop",
+    "createdAt": "2025-01-01T00:00:00.000Z",
+    "updatedAt": "2025-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "seed-eraser-1",
+    "name": "White Eraser",
+    "details": "Soft white eraser that removes pencil marks cleanly without smudging. Non-toxic and latex-free.",
+    "category": "eraser",
+    "quantity": 80,
+    "price": 12.00,
+    "image": "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=300&h=300&fit=crop",
+    "createdAt": "2025-01-01T00:00:00.000Z",
+    "updatedAt": "2025-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "seed-sharpener-1",
+    "name": "Metal Pencil Sharpener",
+    "details": "Durable metal pencil sharpener with dual holes for different pencil sizes. Includes shaving container.",
+    "category": "sharpener",
+    "quantity": 70,
+    "price": 18.50,
+    "image": "https://images.unsplash.com/photo-1581833971358-2c8b550f87b3?w=300&h=300&fit=crop",
+    "createdAt": "2025-01-01T00:00:00.000Z",
+    "updatedAt": "2025-01-01T00:00:00.000Z"
+  }
+]
+
+

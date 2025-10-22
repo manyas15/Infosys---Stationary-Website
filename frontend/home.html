@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Stationery App - Product Management</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+  <div class="background-animation"></div>
+  
+  <header class="topbar">
+    <div class="brand">
+      <i class="fas fa-store"></i>
+      Stationery Store
+    </div>
+    <div class="spacer"></div>
+    <div id="userBox" class="user-info"></div>
+    <button id="logoutBtn" class="danger">
+      <i class="fas fa-sign-out-alt"></i>
+      Logout
+    </button>
+  </header>
+
+  <main class="container">
+    <div class="welcome-section">
+      <h1>Product Management Dashboard</h1>
+      <p>Manage your stationery inventory with ease</p>
+    </div>
+
+    <div class="action-cards">
+      <div class="action-card add-card">
+        <div class="card-icon">
+          <i class="fas fa-plus-circle"></i>
+        </div>
+        <h3>Add Product</h3>
+        <p>Add new products to your inventory</p>
+        <a href="add.html" class="action-btn">
+          <i class="fas fa-arrow-right"></i>
+          Add Product
+        </a>
+      </div>
+
+      <div class="action-card update-card">
+        <div class="card-icon">
+          <i class="fas fa-edit"></i>
+        </div>
+        <h3>Update Product</h3>
+        <p>Modify existing product information</p>
+        <a href="update.html" class="action-btn">
+          <i class="fas fa-arrow-right"></i>
+          Update Product
+        </a>
+      </div>
+
+      <div class="action-card delete-card">
+        <div class="card-icon">
+          <i class="fas fa-trash-alt"></i>
+        </div>
+        <h3>Delete Product</h3>
+        <p>Remove products from inventory</p>
+        <a href="delete.html" class="action-btn">
+          <i class="fas fa-arrow-right"></i>
+          Delete Product
+        </a>
+      </div>
+    </div>
+
+    <section class="card products-section">
+      <div class="section-header">
+        <h3>
+          <i class="fas fa-boxes"></i>
+          Current Inventory
+        </h3>
+        <span id="itemCount" class="item-count">0 products</span>
+      </div>
+      <div id="items" class="grid list"></div>
+    </section>
+  </main>
+
+  <script src="js/api.js"></script>
+  <script src="js/auth.js"></script>
+  <script>
+    guardAuth();
+    const user = getCurrentUser();
+    document.getElementById('userBox').innerHTML = user ? 
+      `<i class="fas fa-user"></i> Welcome, ${user.name}` : '';
+    document.getElementById('logoutBtn').onclick = () => { logout(); location.href = 'index.html'; };
+    
+    (async function load() {
+      try {
+        const data = await apiGet('/api/items');
+        const box = document.getElementById('items');
+        const countEl = document.getElementById('itemCount');
+        
+        box.innerHTML = '';
+        countEl.textContent = `${data.items.length} products`;
+        
+        if (data.items.length === 0) {
+          box.innerHTML = '<div class="empty-state"><i class="fas fa-box-open"></i><p>No products found. Add some products to get started!</p></div>';
+          return;
+        }
+        
+        data.items.forEach(it => {
+          const div = document.createElement('div');
+          div.className = 'item';
+          div.innerHTML = `
+            <div class="item-image">
+              ${it.image ? `<img src="${it.image}" alt="${it.name}" onerror="this.style.display='none'">` : '<i class="fas fa-image"></i>'}
+            </div>
+            <div class="item-content">
+              <h4>${it.name}</h4>
+              <p class="item-details">${it.details || 'No details available'}</p>
+              <div class="item-meta">
+                <span class="category"><i class="fas fa-tag"></i> ${it.category}</span>
+                <span class="quantity"><i class="fas fa-boxes"></i> ${it.quantity}</span>
+                <span class="price"><i class="fas fa-rupee-sign"></i> ${it.price}</span>
+              </div>
+            </div>
+          `;
+          box.appendChild(div);
+        });
+      } catch (error) {
+        console.error('Error loading items:', error);
+        document.getElementById('items').innerHTML = '<div class="error-state"><i class="fas fa-exclamation-triangle"></i><p>Error loading products</p></div>';
+      }
+    })();
+  </script>
+</body>
+</html>
+
+
