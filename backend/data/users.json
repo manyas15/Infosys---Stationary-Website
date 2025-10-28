@@ -5,5 +5,12 @@
     "email": "manya@gmail.com",
     "passwordHash": "$2b$10$lGZ5zWF37OPTWatKhi/dnOv6cYLqq2/44UM2zMGTAkEKginBwgcT6",
     "createdAt": "2025-10-17T18:20:23.551Z"
+  },
+  {
+    "id": "be6a9e2b-e8e7-4643-984e-b26eb7fb1186",
+    "name": "Manya Manya",
+    "email": "manyasachdeva60@gmail.com",
+    "passwordHash": "$2b$10$x4yfrDFTkkZGn14Tb6n.xe9ANBwjPP66x7P4F/AZojDULPw.p2c/m",
+    "createdAt": "2025-10-28T15:09:21.439Z"
   }
 ]
