@@ -11,16 +11,46 @@
     <h1>Stationery App</h1>
     <div class="card">
       <h2>Sign up</h2>
-      <form id="signupForm">
-        <label>Name
-          <input type="text" id="name" required />
-        </label>
-        <label>Email
-          <input type="email" id="email" required />
-        </label>
-        <label>Password
-          <input type="password" id="password" minlength="6" required />
-        </label>
+      <form id="signupForm" novalidate>
+        <div class="grid">
+          <label>
+            Full Name
+            <input type="text" id="fullName" name="fullName" required minlength="2" />
+          </label>
+          <label>
+            Company Name
+            <input type="text" id="companyName" name="companyName" required />
+          </label>
+          <label>
+            Official Email ID
+            <input type="email" id="email" name="email" required />
+          </label>
+          <label>
+            Password
+            <input type="password" id="password" name="password" required minlength="8" />
+            <small>(Must include a-z, A-Z, 0-9, and special character.)</small>
+          </label>
+          <label>
+            Confirm Password
+            <input type="password" id="confirmPassword" name="confirmPassword" required />
+          </label>
+          <label>
+            Role
+            <select id="role" name="role" required>
+              <option value="">Select Role</option>
+              <option>Admin</option>
+              <option>Store Manager</option>
+            </select>
+          </label>
+          <label>
+            Contact Number
+            <input type="tel" id="contactNumber" name="contactNumber" required placeholder="9876543210" />
+          </label>
+          <label class="span-2">
+            Warehouse Location
+            <input type="text" id="warehouseLocation" name="warehouseLocation" required />
+          </label>
+        </div>
         <button type="submit">Create account</button>
       </form>
       <p>Have an account? <a href="index.html">Login</a></p>
@@ -31,13 +61,34 @@
   <script>
     document.getElementById('signupForm').addEventListener('submit', async (e) => {
       e.preventDefault();
-      const name = document.getElementById('name').value.trim();
-      const email = document.getElementById('email').value.trim();
-      const password = document.getElementById('password').value;
       const msg = document.getElementById('signupMsg');
       msg.textContent = '';
+      const fullName = document.getElementById('fullName').value.trim();
+      const companyName = document.getElementById('companyName').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+      const confirmPassword = document.getElementById('confirmPassword').value;
+      const role = document.getElementById('role').value;
+      const contactNumber = document.getElementById('contactNumber').value.trim();
+      const warehouseLocation = document.getElementById('warehouseLocation').value.trim();
+
+      if (password !== confirmPassword) {
+        msg.textContent = 'Passwords do not match';
+        return;
+      }
+
+      const payload = {
+        name: fullName,
+        companyName,
+        email,
+        password,
+        role,
+        contactNumber,
+        warehouseLocation
+      };
+
       try {
-        await signup(name, email, password);
+        await signup(payload);
         msg.textContent = 'Signup successful! Redirecting to home…';
         setTimeout(() => location.href = 'home.html', 600);
       } catch (err) {

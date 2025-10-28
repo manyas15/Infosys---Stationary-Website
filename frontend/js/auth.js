@@ -1,8 +1,15 @@
-async function signup(name, email, password){
+async function signup(nameOrPayload, email, password){
+  // Support two call styles:
+  //  - signup({ name, email, password, ... })
+  //  - signup(name, email, password)
+  const payload = (typeof nameOrPayload === 'object')
+    ? nameOrPayload
+    : { name: nameOrPayload, email, password };
+
   const res = await fetch('http://localhost:4000/api/auth/signup', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ name, email, password })
+    body: JSON.stringify(payload)
   });
   const data = await res.json().catch(()=>({}));
   if (!res.ok) throw new Error(data.error || 'Signup failed');
