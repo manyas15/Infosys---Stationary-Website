@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Stationery App - Stock Transactions</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+  <div class="background-animation"></div>
+  <header class="topbar">
+    <div class="brand">
+      <i class="fas fa-store"></i>
+      Stationery Store
+    </div>
+    <div class="spacer"></div>
+    <a href="home.html" class="btn">
+      <i class="fas fa-arrow-left"></i>
+      Back
+    </a>
+    <button id="logoutBtn" class="danger">
+      <i class="fas fa-sign-out-alt"></i>
+      Logout
+    </button>
+  </header>
+
+  <main class="container">
+    <div class="welcome-section">
+      <h1>Stock In / Stock Out</h1>
+      <p>Record incoming shipments and outgoing sales; view transaction history</p>
+    </div>
+
+    <section class="grid two-columns">
+      <div class="card">
+        <h3><i class="fas fa-arrow-down"></i> Stock In</h3>
+        <form id="stockInForm" class="form-grid">
+          <label>Item
+            <select id="inItem" required></select>
+          </label>
+          <label>Quantity
+            <input type="number" id="inQty" min="1" required />
+          </label>
+          <label>Notes
+            <input type="text" id="inNotes" placeholder="e.g., PO#123, supplier name" />
+          </label>
+          <button type="submit"><i class="fas fa-plus-circle"></i> Add Stock</button>
+          <p id="inMsg" class="msg"></p>
+        </form>
+      </div>
+
+      <div class="card">
+        <h3><i class="fas fa-arrow-up"></i> Stock Out</h3>
+        <form id="stockOutForm" class="form-grid">
+          <label>Item
+            <select id="outItem" required></select>
+          </label>
+          <label>Quantity
+            <input type="number" id="outQty" min="1" required />
+          </label>
+          <label>Notes
+            <input type="text" id="outNotes" placeholder="e.g., invoice #, customer" />
+          </label>
+          <button type="submit" class="danger"><i class="fas fa-minus-circle"></i> Remove Stock</button>
+          <p id="outMsg" class="msg"></p>
+        </form>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="section-header">
+        <h3><i class="fas fa-history"></i> Transaction History</h3>
+        <span id="txnCount" class="item-count">0 records</span>
+      </div>
+      <div class="table-responsive">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Time</th>
+              <th>Type</th>
+              <th>Item</th>
+              <th>Qty</th>
+              <th>Handler</th>
+              <th>Notes</th>
+            </tr>
+          </thead>
+          <tbody id="txnBody">
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <script src="js/api.js"></script>
+  <script src="js/auth.js"></script>
+  <script>
+    guardAuth();
+    document.getElementById('logoutBtn').onclick = () => { logout(); location.href = 'index.html'; };
+
+    const inItem = document.getElementById('inItem');
+    const outItem = document.getElementById('outItem');
+    const txnBody = document.getElementById('txnBody');
+    const txnCount = document.getElementById('txnCount');
+
+    function option(text, value) {
+      const opt = document.createElement('option');
+      opt.value = value;
+      opt.textContent = text;
+      return opt;
+    }
+
+    async function loadItems() {
+      const data = await apiGet('/api/items');
+      [inItem, outItem].forEach(sel => { sel.innerHTML = ''; });
+      if (!data.items.length) {
+        [inItem, outItem].forEach(sel => sel.appendChild(option('No items found', '')));
+        return;
+      }
+      data.items.forEach(i => {
+        const text = `${i.name} (Qty: ${i.quantity})`;
+        inItem.appendChild(option(text, i.id));
+        outItem.appendChild(option(text, i.id));
+      });
+    }
+
+    function fmtDate(iso) {
+      try { return new Date(iso).toLocaleString(); } catch { return iso; }
+    }
+
+    function renderTransactions(list) {
+      txnBody.innerHTML = '';
+      txnCount.textContent = `${list.length} records`;
+      if (!list.length) {
+        const tr = document.createElement('tr');
+        tr.innerHTML = '<td colspan="6" class="muted">No transactions yet</td>';
+        txnBody.appendChild(tr);
+        return;
+      }
+      list.forEach(t => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${fmtDate(t.createdAt)}</td>
+          <td><span class="${t.type === 'stock-in' ? 'badge success' : 'badge danger'}">${t.type}</span></td>
+          <td>${t.itemName}</td>
+          <td>${t.quantity}</td>
+          <td>${t.handledBy?.name || '—'}</td>
+          <td>${t.notes || ''}</td>
+        `;
+        txnBody.appendChild(tr);
+      });
+    }
+
+    async function loadTransactions() {
+      const data = await apiGet('/api/transactions?limit=100');
+      renderTransactions(data.transactions || []);
+    }
+
+    document.getElementById('stockInForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const msg = document.getElementById('inMsg');
+      msg.textContent = '';
+      try {
+        const payload = {
+          itemId: inItem.value,
+          quantity: Number(document.getElementById('inQty').value),
+          notes: document.getElementById('inNotes').value.trim()
+        };
+        await apiPost('/api/transactions/stock-in', payload);
+        msg.textContent = 'Stock added successfully';
+        await loadItems();
+        await loadTransactions();
+        e.target.reset();
+      } catch (err) {
+        msg.textContent = err.message || 'Failed to add stock';
+      }
+    });
+
+    document.getElementById('stockOutForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const msg = document.getElementById('outMsg');
+      msg.textContent = '';
+      try {
+        const payload = {
+          itemId: outItem.value,
+          quantity: Number(document.getElementById('outQty').value),
+          notes: document.getElementById('outNotes').value.trim()
+        };
+        await apiPost('/api/transactions/stock-out', payload);
+        msg.textContent = 'Stock removed successfully';
+        await loadItems();
+        await loadTransactions();
+        e.target.reset();
+      } catch (err) {
+        msg.textContent = err.message || 'Failed to remove stock';
+      }
+    });
+
+    (async function init(){
+      try {
+        await loadItems();
+        await loadTransactions();
+      } catch (e) {
+        console.error(e);
+      }
+    })();
+  </script>
+</body>
+</html>
+
+

@@ -12,5 +12,33 @@
     "email": "manyasachdeva60@gmail.com",
     "passwordHash": "$2b$10$x4yfrDFTkkZGn14Tb6n.xe9ANBwjPP66x7P4F/AZojDULPw.p2c/m",
     "createdAt": "2025-10-28T15:09:21.439Z"
+  },
+  {
+    "id": "e2f1376e-9af4-44dd-a8a1-f52455db5a02",
+    "name": "Manya s",
+    "email": "manyasachdeva6@gmail.com",
+    "passwordHash": "$2b$10$pBxdkUyJUdz0ZADz/keuxuClFn8jTUifsNDtyRBgSsa4uKfKGSl9O",
+    "createdAt": "2025-10-29T14:35:14.669Z"
+  },
+  {
+    "id": "f794779e-b982-4986-a3c7-5f6aac406c3c",
+    "name": "Manya Sachdeva",
+    "email": "manyasachdeva15@gmail.com",
+    "passwordHash": "$2b$10$93E112KmWwAyKKMcU.xIkuvsh0k32kiErv9u5L0iAPQuODXCs9RH2",
+    "createdAt": "2025-10-29T14:37:59.468Z"
+  },
+  {
+    "id": "76f124da-ee25-480c-9d4d-2e91a0ebf7b9",
+    "name": "manya",
+    "email": "manyasachdeva1512@gmail.com",
+    "passwordHash": "$2b$10$9ZPn/jyrPrZMEjXhKdGi7.yy7p38aRpbpc6Tdp6NPqTx2WE5GNVWm",
+    "createdAt": "2025-11-05T14:55:25.011Z"
+  },
+  {
+    "id": "41fab83a-7fe7-4008-b8f3-916f37f68447",
+    "name": "manya s",
+    "email": "manyasachdeva45@gmail.com",
+    "passwordHash": "$2b$10$AktgNxzZZI2Q1NlvDdb4IuQdz3FmNxRbhKa05Zpwi9352fwx67qZ.",
+    "createdAt": "2025-11-05T15:00:00.809Z"
   }
 ]

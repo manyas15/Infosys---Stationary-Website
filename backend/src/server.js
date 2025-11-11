@@ -4,6 +4,7 @@ const path = require('path');
 
 const authRoutes = require('./routes/auth');
 const itemRoutes = require('./routes/items');
+const transactionRoutes = require('./routes/transactions');
 
 const app = express();
 const PORT = process.env.PORT || 4000;
@@ -26,6 +27,7 @@ app.get('/', (req, res) => {
 
 app.use('/api/auth', authRoutes);
 app.use('/api/items', itemRoutes);
+app.use('/api/transactions', transactionRoutes);
 
 // Global 404
 app.use((req, res) => {

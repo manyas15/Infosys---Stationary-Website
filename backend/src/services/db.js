@@ -4,11 +4,13 @@ const path = require('path');
 const dataDir = path.join(__dirname, '../../data');
 const usersFile = path.join(dataDir, 'users.json');
 const itemsFile = path.join(dataDir, 'items.json');
+const transactionsFile = path.join(dataDir, 'transactions.json');
 
 function ensureFilesExist() {
   if (!fs.existsSync(dataDir)) fs.mkdirSync(dataDir, { recursive: true });
   if (!fs.existsSync(usersFile)) fs.writeFileSync(usersFile, JSON.stringify([] , null, 2));
   if (!fs.existsSync(itemsFile)) fs.writeFileSync(itemsFile, JSON.stringify([] , null, 2));
+  if (!fs.existsSync(transactionsFile)) fs.writeFileSync(transactionsFile, JSON.stringify([] , null, 2));
 }
 
 ensureFilesExist();
@@ -38,11 +40,21 @@ function saveItems(items) {
   writeJson(itemsFile, items);
 }
 
+function getTransactions() {
+  return readJson(transactionsFile);
+}
+
+function saveTransactions(transactions) {
+  writeJson(transactionsFile, transactions);
+}
+
 module.exports = {
   getUsers,
   saveUsers,
   getItems,
   saveItems,
+  getTransactions,
+  saveTransactions,
 };
 
 
