@@ -4,11 +4,11 @@
     "name": "Mathematics Textbook",
     "details": "Comprehensive mathematics textbook covering algebra, geometry, and calculus. Suitable for high school students.",
     "category": "book",
-    "quantity": 30,
+    "quantity": 32,
     "price": 125,
     "image": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcRadXQT7MbENWurw-nu-ps-HbkPqfbCAFfWjUuw1o5sxC34UrPzYwStOtkt76q5TGcpFt2QQOHBhO0Q5rp1rvMENpsM88-2YuMnRJIagGs",
     "createdAt": "2025-01-01T00:00:00.000Z",
-    "updatedAt": "2025-11-05T15:02:09.528Z"
+    "updatedAt": "2025-11-11T14:46:08.034Z"
   },
   {
     "id": "seed-copy-1",

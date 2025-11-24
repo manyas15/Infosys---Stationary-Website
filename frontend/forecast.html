@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Demand Forecast - Stationery</title>
+  <link rel="stylesheet" href="styles.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <div class="container">
+    <h1>AI-Based Demand Forecasting</h1>
+    <div class="card">
+      <form id="forecastForm">
+        <label>Horizon (days)
+          <input type="number" id="horizon" value="7" min="1" max="30" />
+        </label>
+        <button type="submit">Run Forecast</button>
+      </form>
+
+      <canvas id="forecastChart" height="120"></canvas>
+
+      <h2>Predictions</h2>
+      <table id="predictionTable">
+        <thead>
+          <tr><th>Product Name</th><th>Forecast (sum)</th><th>Current Stock</th><th>Action</th></tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    async function runForecast(horizon=7) {
+      const res = await fetch(`/api/forecast?horizon=${horizon}`);
+      const data = await res.json();
+      return data;
+    }
+
+    const ctx = document.getElementById('forecastChart').getContext('2d');
+    let chart = new Chart(ctx, {
+      type: 'line',
+      data: { labels: [], datasets: [] },
+      options: { responsive: true }
+    });
+
+    function renderTable(results) {
+      const tbody = document.querySelector('#predictionTable tbody');
+      tbody.innerHTML = '';
+      for (const r of results) {
+        const tr = document.createElement('tr');
+        // show product name in the first column (not internal id)
+        tr.innerHTML = `<td>${r.name || r.id}</td><td>${r.forecastSum}</td><td>${r.currentStock}</td><td>${r.action}</td>`;
+        tbody.appendChild(tr);
+      }
+    }
+
+    function renderChart(results, horizon) {
+      const labels = Array.from({length: horizon}, (_,i) => `Day ${i+1}`);
+      const datasets = results.slice(0,5).map((r, idx) => ({
+        label: r.name,
+        data: r.forecast,
+        borderWidth: 2
+      }));
+
+      chart.data.labels = labels;
+      chart.data.datasets = datasets;
+      chart.update();
+    }
+
+    document.getElementById('forecastForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const horizon = parseInt(document.getElementById('horizon').value || '7', 10);
+      document.querySelector('#predictionTable tbody').innerHTML = '<tr><td colspan="4">Loading…</td></tr>';
+      try {
+        const { results } = await runForecast(horizon);
+        renderTable(results);
+        renderChart(results, horizon);
+      } catch (err) {
+        document.querySelector('#predictionTable tbody').innerHTML = `<tr><td colspan="4">Error: ${err.message}</td></tr>`;
+      }
+    });
+  </script>
+</body>
+</html>

@@ -1,1 +1,16 @@
-[]
+[
+  {
+    "id": "7a4be9c5-8f50-4810-bfb9-c43f3d93ee5b",
+    "type": "stock-in",
+    "itemId": "seed-book-1",
+    "itemName": "Mathematics Textbook",
+    "quantity": 2,
+    "notes": "1234, Manvi",
+    "handledBy": {
+      "id": "be6a9e2b-e8e7-4643-984e-b26eb7fb1186",
+      "name": "Manya Manya",
+      "email": "manyasachdeva60@gmail.com"
+    },
+    "createdAt": "2025-11-11T14:46:08.037Z"
+  }
+]

@@ -4,6 +4,7 @@ const path = require('path');
 
 const authRoutes = require('./routes/auth');
 const itemRoutes = require('./routes/items');
+const forecastRoutes = require('./routes/forecast');
 const transactionRoutes = require('./routes/transactions');
 
 const app = express();
@@ -27,6 +28,7 @@ app.get('/', (req, res) => {
 
 app.use('/api/auth', authRoutes);
 app.use('/api/items', itemRoutes);
+app.use('/api/forecast', forecastRoutes);
 app.use('/api/transactions', transactionRoutes);
 
 // Global 404

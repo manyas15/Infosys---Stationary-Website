@@ -36,6 +36,9 @@ By default the server listens on port `4000`. Open http://localhost:4000 in your
 3. Open the frontend directly (alternative)
 - The frontend is static — you can open `frontend/index.html` directly in a browser, but some pages expect the API to be at `http://localhost:4000`. For full functionality serve the frontend via the backend (recommended).
 
+4. Using Stock In/Out
+- Login, open `home.html`, and click "Stock In / Out" to record transactions and view history.
+
 ## Environment variables
 
 The server reads optional environment variables:
@@ -55,11 +58,11 @@ Base URL: `http://localhost:4000/api`
 
 Auth
 - POST /api/auth/signup
-  - body: { "username": "...", "password": "..." }
-  - response: user object (or error)
+  - body: { "name": "...", "email": "...", "password": "..." }
+  - response: { token, user }
 - POST /api/auth/login
-  - body: { "username": "...", "password": "..." }
-  - response: { token: "<jwt>" } on success
+  - body: { "email": "...", "password": "..." }
+  - response: { token, user } on success
 - GET /api/auth/me
   - header: Authorization: Bearer <token>
   - response: current user
@@ -77,10 +80,32 @@ Items
 - DELETE /api/items/:id
   - protected, delete item
 
+Stock Transactions
+- GET /api/transactions?limit=100
+  - protected
+  - returns most recent transactions first
+- POST /api/transactions/stock-in
+  - protected
+  - body: { "itemId": "<uuid>", "quantity": <positive number>, "notes": "optional" }
+  - effect: increases item quantity; records transaction with timestamp and handler
+- POST /api/transactions/stock-out
+  - protected
+  - body: { "itemId": "<uuid>", "quantity": <positive number>, "notes": "optional" }
+  - effect: decreases item quantity (not below zero); records transaction
+
 Example curl (Windows cmd):
 ```cmd
 curl -X GET http://localhost:4000/api/items
-curl -X POST http://localhost:4000/api/auth/login -H "Content-Type: application/json" -d "{\"username\":\"alice\",\"password\":\"pass\"}"
+curl -X POST http://localhost:4000/api/auth/login -H "Content-Type: application/json" -d "{\"email\":\"alice@example.com\",\"password\":\"pass\"}"
+
+:: Set token variable for subsequent calls
+for /f "delims=" %a in ('curl -s -X POST http://localhost:4000/api/auth/login -H "Content-Type: application/json" -d "{\""email\"":\""alice@example.com\"",\""password\"":\""pass\""}" ^| jq -r ".token"') do @set TOKEN=%a
+
+:: Stock-in 10 units
+curl -X POST http://localhost:4000/api/transactions/stock-in -H "Authorization: Bearer %TOKEN%" -H "Content-Type: application/json" -d "{\"itemId\":\"<ITEM_ID>\",\"quantity\":10,\"notes\":\"supplier PO#123\"}"
+
+:: Stock-out 2 units
+curl -X POST http://localhost:4000/api/transactions/stock-out -H "Authorization: Bearer %TOKEN%" -H "Content-Type: application/json" -d "{\"itemId\":\"<ITEM_ID>\",\"quantity\":2,\"notes\":\"invoice 987\"}"
 ```
 
 ## Project structure
@@ -89,12 +114,12 @@ curl -X POST http://localhost:4000/api/auth/login -H "Content-Type: application/
   - package.json
   - src/
     - server.js         (Express server)
-    - routes/           (auth and items)
+    - routes/           (auth, items, transactions)
     - services/         (file-backed data helpers)
     - middleware/       (auth middleware)
-  - data/               (items.json, users.json)
+  - data/               (items.json, users.json, transactions.json)
 - frontend/
-  - index.html, add.html, update.html, etc.
+  - index.html, home.html, add.html, update.html, delete.html, transactions.html
   - js/                 (api client, auth)
   - styles.css
 
