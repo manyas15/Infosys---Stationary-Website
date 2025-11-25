@@ -70,7 +70,9 @@ public class ForecastController {
         List<Double> preds = new ArrayList<>();
         for (int t = n; t < n + horizon; t++) {
             double p = intercept + slope * t;
-            if (Double.isNaN(p) || Double.isInfinite(p)) p = meanY;
+            if (Double.isNaN(p) || Double.isInfinite(p)) {
+                p = meanY;
+            }
             p = Math.max(0.0, Math.round(p * 100.0) / 100.0);
             preds.add(p);
         }
