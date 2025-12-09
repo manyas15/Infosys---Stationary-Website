@@ -1,1 +1,64 @@
-[]
+[
+  {
+    "id": "7d0f8b38-0a97-4ab5-98fe-169f8116552a",
+    "supplier": "Unknown Supplier",
+    "createdAt": "2025-12-09T12:31:07.836Z",
+    "status": "created",
+    "lines": [
+      {
+        "id": "seed-copy-1",
+        "name": "Spiral Notebook",
+        "qty": 92,
+        "unitPrice": null
+      },
+      {
+        "id": "seed-eraser-1",
+        "name": "White Eraser",
+        "qty": 55,
+        "unitPrice": null
+      }
+    ]
+  },
+  {
+    "id": "cd53cdb0-89cd-4d2a-bca8-b5891496c570",
+    "supplier": "Unknown Supplier",
+    "createdAt": "2025-12-09T12:38:13.918Z",
+    "status": "created",
+    "lines": [
+      {
+        "id": "seed-eraser-1",
+        "name": "White Eraser",
+        "qty": 55,
+        "unitPrice": null
+      }
+    ]
+  },
+  {
+    "id": "45ebafcf-1c8d-4fa5-96a4-a23734c3c95c",
+    "supplier": "Unknown Supplier",
+    "createdAt": "2025-12-09T12:38:18.539Z",
+    "status": "created",
+    "lines": [
+      {
+        "id": "seed-eraser-1",
+        "name": "White Eraser",
+        "qty": 55,
+        "unitPrice": null
+      }
+    ]
+  },
+  {
+    "id": "0248bf24-016d-4990-9660-75d49eea4c36",
+    "supplier": "Unknown Supplier",
+    "createdAt": "2025-12-09T12:38:20.542Z",
+    "status": "created",
+    "lines": [
+      {
+        "id": "seed-eraser-1",
+        "name": "White Eraser",
+        "qty": 55,
+        "unitPrice": null
+      }
+    ]
+  }
+]

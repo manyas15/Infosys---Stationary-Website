@@ -141,6 +141,30 @@ Exports
 - GET /api/exports/transactions/xlsx (auth) — Excel-friendly CSV with XLSX filename
 ```
 
+## Final Features & Updates (2025)
+
+- **Role-based authentication**: Signup/login supports admin and user roles. Admins see full dashboard, users see request page.
+- **Product dashboard**: Add, update, delete, and stock in/out for items. Accessible via `home.html`.
+- **Admin dashboard**: KPIs, recent transactions, and download buttons for CSV/XLSX. Charts now render correctly (Top Restock Value, Inventory Breakdown).
+- **Auto-Restock & PO**: Restock suggestions use demand forecast and reorder levels. Create PO for selected items, download PO as CSV.
+- **Forecasts**: Uses external service if available, otherwise built-in fallback (trend-based). Source indicator shown in UI.
+- **Exports**: Download transactions as CSV or real Excel (.xlsx) file. Excel export now opens in Microsoft Excel with correct formatting.
+- **Diagnostics**: Restock page shows diagnostics table if no suggestions (qty, forecast, reorder level).
+- **Data**: All data stored in JSON files (`backend/data/`). Sample items and transactions included for demo/testing.
+- **Error handling**: All major actions show visible error messages in UI and console. Charts and downloads now robust against empty data and format issues.
+- **Frontend**: All charts (pie, bar) now render correctly with responsive sizing. UI improved for clarity and usability.
+
+### How to use
+- Start backend (`npm start` in `backend/`)
+- Open `http://localhost:4000` in browser
+- Signup as admin or user, login, and use dashboard features
+- For exports, ensure you are logged in as admin
+- For forecast, external service is optional
+- For restock/PO, lower item quantity or reorder level to see suggestions
+- For Excel export, use the XLSX button in admin dashboard
+
+---
+
 ## Project structure
 
 - backend/

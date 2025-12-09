@@ -1,1 +1,54 @@
-[]
+[
+  {
+    "id": "tx-001",
+    "createdAt": "2025-12-08T10:30:00.000Z",
+    "type": "stock-in",
+    "itemId": "seed-copy-1",
+    "itemName": "Spiral Notebook",
+    "quantity": 50,
+    "handledBy": {
+      "name": "Admin User",
+      "email": "admin@example.com"
+    },
+    "notes": "Restocking from supplier"
+  },
+  {
+    "id": "tx-002",
+    "createdAt": "2025-12-08T14:15:00.000Z",
+    "type": "stock-out",
+    "itemId": "seed-eraser-1",
+    "itemName": "White Eraser",
+    "quantity": 10,
+    "handledBy": {
+      "name": "Admin User",
+      "email": "admin@example.com"
+    },
+    "notes": "Sold to customer"
+  },
+  {
+    "id": "tx-003",
+    "createdAt": "2025-12-09T09:00:00.000Z",
+    "type": "stock-in",
+    "itemId": "b027a397-deab-42e5-bd30-406707ec465b",
+    "itemName": "pen",
+    "quantity": 20,
+    "handledBy": {
+      "name": "Admin User",
+      "email": "admin@example.com"
+    },
+    "notes": "New stock arrival"
+  },
+  {
+    "id": "tx-004",
+    "createdAt": "2025-12-09T11:30:00.000Z",
+    "type": "stock-out",
+    "itemId": "abae8525-43a1-462a-87ad-912f778dc80e",
+    "itemName": "pen",
+    "quantity": 5,
+    "handledBy": {
+      "name": "Admin User",
+      "email": "admin@example.com"
+    },
+    "notes": "Bulk order"
+  }
+]

@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Restock Test</title>
+</head>
+<body>
+    <h1>Restock API Test</h1>
+    <button id="testBtn">Test API</button>
+    <div id="output" style="margin-top:20px;padding:10px;border:1px solid #ccc;"></div>
+    
+    <script>
+        console.log('Test page loaded');
+        
+        document.getElementById('testBtn').addEventListener('click', async () => {
+            const output = document.getElementById('output');
+            output.innerHTML = 'Loading...';
+            
+            try {
+                // Test items API
+                const itemsRes = await fetch('/api/items');
+                const itemsData = await itemsRes.json();
+                console.log('Items:', itemsData);
+                
+                // Test suggestions API
+                const suggestRes = await fetch('/api/restock/suggestions');
+                const suggestData = await suggestRes.json();
+                console.log('Suggestions:', suggestData);
+                
+                output.innerHTML = `
+                    <h3>Items API: ${itemsRes.status}</h3>
+                    <p>Count: ${itemsData.items.length}</p>
+                    <h3>Suggestions API: ${suggestRes.status}</h3>
+                    <p>Count: ${suggestData.suggestions.length}</p>
+                    <pre>${JSON.stringify(suggestData.suggestions, null, 2)}</pre>
+                `;
+            } catch (err) {
+                console.error('Error:', err);
+                output.innerHTML = '<p style="color:red;">Error: ' + err.message + '</p>';
+            }
+        });
+    </script>
+</body>
+</html>

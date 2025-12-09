@@ -1,19 +1,47 @@
+console.log('[RESTOCK] Script loaded at', new Date().toISOString());
+console.log('[RESTOCK] Document readyState:', document.readyState);
+
+// Add immediate visual feedback
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', () => {
+    console.log('[RESTOCK] DOM NOW READY');
+  });
+} else {
+  console.log('[RESTOCK] DOM ALREADY READY');
+}
+
 async function fetchSuggestions() {
+  console.log('[RESTOCK] Fetching suggestions...');
   const res = await fetch('/api/restock/suggestions?_=' + Date.now(), { cache: 'no-store' });
-  if (!res.ok) throw new Error('Failed to load suggestions');
-  return res.json();
+  console.log('[RESTOCK] Suggestions response:', res.status, res.statusText);
+  if (!res.ok) {
+    const errorText = await res.text();
+    console.error('[RESTOCK] Suggestions error:', errorText);
+    throw new Error('Failed to load suggestions: ' + errorText);
+  }
+  const data = await res.json();
+  console.log('[RESTOCK] Suggestions data:', data);
+  return data;
 }
 let summaryChart = null;
 let forecastChart = null;
 
 async function fetchAllItems(){
+  console.log('[RESTOCK] Fetching all items...');
   const res = await fetch('/api/items');
-  if (!res.ok) throw new Error('Failed to load items');
+  console.log('[RESTOCK] Items response:', res.status, res.statusText);
+  if (!res.ok) {
+    const errorText = await res.text();
+    console.error('[RESTOCK] Items error:', errorText);
+    throw new Error('Failed to load items: ' + errorText);
+  }
   const data = await res.json();
-  return data.items || [];
+  const items = data.items || [];
+  console.log('[RESTOCK] Items data:', items.length, 'items loaded');
+  return items;
 }
 
-function renderSuggestions(suggestions) {
+async function renderSuggestions(suggestions) {
   const area = document.getElementById('suggestions-area');
   if (!suggestions || suggestions.length === 0) {
     // No suggestions: show helpful diagnostics so user can see why
@@ -75,25 +103,35 @@ function renderSuggestions(suggestions) {
 
   // Update KPI values in rupees
   try {
+    console.log('[RESTOCK] Updating KPIs...');
     const items = await fetchAllItems();
+    console.log('[RESTOCK] Building item map from', items.length, 'items');
     const itemMap = {}; items.forEach(i=> itemMap[i.id||i.sku||i.name]=i);
     const totalValue = items.reduce((sum,it)=> sum + (Number(it.quantity||0) * Number(it.price||0)), 0);
     const restockValue = suggestions.reduce((sum,s)=> sum + (Number(s.suggestedQty||0) * Number((itemMap[s.id]||{}).price || 0)), 0);
     const lowCount = suggestions.length;
+    console.log('[RESTOCK] KPIs computed - Total:', totalValue, 'Restock:', restockValue, 'Low count:', lowCount);
     document.getElementById('kpi-total-value').textContent = `₹${totalValue.toLocaleString()}`;
     document.getElementById('kpi-restock-value').textContent = `₹${restockValue.toLocaleString()}`;
     document.getElementById('kpi-low-count').textContent = `${lowCount}`;
 
-    // Prepare data for pie chart: available vs restock value
-    const availableValue = Math.max(0, totalValue - restockValue);
-    updatePieChart(['Available (₹)','To Restock (₹)'], [availableValue, restockValue]);
+    // Prepare data for pie chart showing inventory breakdown
+    // Show current stock value for items that need restock vs those that don't
+    const restockItems = suggestions.map(s => s.id);
+    const needsRestockValue = items.filter(i => restockItems.includes(i.id)).reduce((sum,it)=> sum + (Number(it.quantity||0) * Number(it.price||0)), 0);
+    const okStockValue = totalValue - needsRestockValue;
+    console.log('[RESTOCK] Pie chart data - OK Stock:', okStockValue, 'Needs Restock:', needsRestockValue);
+    updatePieChart(['Adequate Stock (₹)','Low Stock Items (₹)'], [okStockValue, needsRestockValue]);
 
-    // Prepare top restock bar chart by value
-    const bars = suggestions.map(s => ({ name: s.name, value: (Number(s.suggestedQty||0) * Number((itemMap[s.id]||{}).price || 0)) }));
-    bars.sort((a,b)=> b.value - a.value);
-    updateTopBarChart(bars.slice(0,8).map(b=>b.name), bars.slice(0,8).map(b=>b.value));
+    console.log('[RESTOCK] KPIs and charts updated successfully');
   } catch (err) {
-    console.warn('kpi update failed', err);
+    console.error('[RESTOCK] KPI update failed:', err);
+    // Show error in UI
+    const errorDiv = document.createElement('div');
+    errorDiv.style.cssText = 'background:#fee; border:1px solid #c00; padding:10px; margin:10px 0; border-radius:4px; color:#c00;';
+    errorDiv.textContent = '⚠️ Error updating KPIs: ' + err.message + '. Check console for details.';
+    const area = document.getElementById('suggestions-area');
+    area.insertBefore(errorDiv, area.firstChild);
   }
 
   // Add click handler to show forecast for an item when name clicked
@@ -156,36 +194,65 @@ function createChart(ctx, type, datasets, labels) {
 }
 
 function updateSummaryChart(labels, datasets) {
-  const ctx = document.getElementById('summaryChart').getContext('2d');
-  if (!summaryChart) {
-    summaryChart = createChart(ctx, 'bar', datasets, labels);
-  } else {
-    summaryChart.data.labels = labels;
-    summaryChart.data.datasets = datasets.map((d, i) => ({
-      label: d.label,
-      data: d.data,
-      backgroundColor: i === 0 ? 'rgba(59,130,246,0.6)' : 'rgba(34,197,94,0.6)',
-      borderColor: i === 0 ? 'rgba(59,130,246,1)' : 'rgba(34,197,94,1)',
-    }));
-    summaryChart.update();
+  console.log('[CHART] updateSummaryChart called with', labels.length, 'labels');
+  const canvas = document.getElementById('summaryChart');
+  if (!canvas) {
+    console.error('[CHART] summaryChart canvas not found!');
+    return;
   }
+  const ctx = canvas.getContext('2d');
+  
+  // Destroy existing charts on this canvas
+  if (summaryChart) {
+    console.log('[CHART] Destroying existing summaryChart');
+    summaryChart.destroy();
+    summaryChart = null;
+  }
+  if (pieChart) {
+    console.log('[CHART] Destroying existing pieChart');
+    pieChart.destroy();
+    pieChart = null;
+  }
+  
+  if (labels.length === 0 && (!datasets || datasets.length === 0)) {
+    console.log('[CHART] No data for chart');
+    return;
+  }
+  
+  console.log('[CHART] Creating bar chart with data:', datasets);
+  summaryChart = createChart(ctx, 'bar', datasets, labels);
+  console.log('[CHART] Bar chart created:', summaryChart);
 }
 
 let pieChart=null;
 function updatePieChart(labels, values){
-  const ctx = document.getElementById('summaryChart').getContext('2d');
-  // reuse same chart area as a doughnut by swapping
-  if (pieChart) {
-    pieChart.data.labels = labels;
-    pieChart.data.datasets[0].data = values;
-    pieChart.update();
+  console.log('[CHART] updatePieChart called with labels:', labels, 'values:', values);
+  const canvas = document.getElementById('summaryChart');
+  if (!canvas) {
+    console.error('[CHART] summaryChart canvas not found for pie!');
     return;
   }
+  const ctx = canvas.getContext('2d');
+  
+  // Destroy existing charts on this canvas
+  if (summaryChart) {
+    console.log('[CHART] Destroying summaryChart for pie');
+    summaryChart.destroy();
+    summaryChart = null;
+  }
+  if (pieChart) {
+    console.log('[CHART] Destroying existing pieChart');
+    pieChart.destroy();
+    pieChart = null;
+  }
+  
+  console.log('[CHART] Creating pie/doughnut chart');
   pieChart = new Chart(ctx, {
     type: 'doughnut',
     data: { labels, datasets: [{ data: values, backgroundColor: ['rgba(59,130,246,0.8)','rgba(245,158,11,0.85)'] }] },
     options: { responsive:true, maintainAspectRatio:false, plugins:{legend:{position:'bottom'}} }
   });
+  console.log('[CHART] Pie chart created:', pieChart);
 }
 
 let topBarChart=null;
@@ -239,25 +306,68 @@ async function showForecastForItem(id, name) {
   }
 }
 
-document.getElementById('get-suggestions').addEventListener('click', async () => {
-  try {
-    const data = await fetchSuggestions();
-    renderSuggestions(data.suggestions);
-  } catch (err) {
-    alert('Error loading suggestions: ' + err.message);
-  }
-});
-
-document.getElementById('create-po').addEventListener('click', async () => {
-  try {
-    await createPoForSelected();
-  } catch (err) {
-    alert('Error creating PO: ' + err.message);
-  }
-});
-
 // Auto-load suggestions on page open for convenience
-document.addEventListener('DOMContentLoaded', () => {
-  const btn = document.getElementById('get-suggestions');
-  if (btn) btn.click();
+document.addEventListener('DOMContentLoaded', async () => {
+  try {
+    console.log('[RESTOCK] DOMContentLoaded - Setting up event listeners');
+    
+    const getSuggestionsBtn = document.getElementById('get-suggestions');
+    const createPoBtn = document.getElementById('create-po');
+    const suggestionsArea = document.getElementById('suggestions-area');
+    
+    if (!getSuggestionsBtn) {
+      console.error('[RESTOCK] get-suggestions button not found!');
+      alert('Error: Get Suggestions button not found in DOM');
+      return;
+    }
+    if (!createPoBtn) {
+      console.error('[RESTOCK] create-po button not found!');
+      alert('Error: Create PO button not found in DOM');
+      return;
+    }
+    
+    console.log('[RESTOCK] Buttons found, attaching event listeners');
+    
+    getSuggestionsBtn.addEventListener('click', async () => {
+      console.log('[RESTOCK] Get Suggestions button clicked');
+      getSuggestionsBtn.disabled = true;
+      getSuggestionsBtn.textContent = 'Loading...';
+      try {
+        const data = await fetchSuggestions();
+        console.log('[RESTOCK] Got data, calling renderSuggestions with:', data.suggestions);
+        renderSuggestions(data.suggestions);
+      } catch (err) {
+        console.error('[RESTOCK] Error loading suggestions:', err);
+        if (suggestionsArea) {
+          suggestionsArea.innerHTML = '<div style="color:red;padding:15px;border:1px solid red;border-radius:4px;">❌ Error loading suggestions: ' + err.message + '</div>';
+        }
+        alert('Error loading suggestions: ' + err.message);
+      } finally {
+        getSuggestionsBtn.disabled = false;
+        getSuggestionsBtn.textContent = 'Get Restock Suggestions';
+      }
+    });
+
+    createPoBtn.addEventListener('click', async () => {
+      console.log('[RESTOCK] Create PO button clicked');
+      createPoBtn.disabled = true;
+      try {
+        await createPoForSelected();
+      } catch (err) {
+        console.error('[RESTOCK] Error creating PO:', err);
+        alert('Error creating PO: ' + err.message);
+      } finally {
+        createPoBtn.disabled = false;
+      }
+    });
+    
+    console.log('[RESTOCK] Event listeners attached, auto-loading suggestions in 500ms');
+    setTimeout(() => {
+      console.log('[RESTOCK] Triggering auto-click');
+      getSuggestionsBtn.click();
+    }, 500);
+  } catch (error) {
+    console.error('[RESTOCK] Fatal error in DOMContentLoaded:', error);
+    alert('Fatal error initializing restock page: ' + error.message);
+  }
 });

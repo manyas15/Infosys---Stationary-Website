@@ -40,16 +40,25 @@
             <button id="create-po" class="submit-btn">Create PO for Selected</button>
           </div>
 
-          <div id="suggestions-area" style="margin-top:16px;"></div>
+          <div id="suggestions-area" style="margin-top:16px;">
+            <p style="color:#888;text-align:center;padding:40px;">
+              <span style="font-size:24px;">⏳</span><br>
+              Loading suggestions...
+            </p>
+          </div>
         </section>
 
         <aside class="restock-right">
           <h3>Overview</h3>
-          <canvas id="summaryChart" height="260"></canvas>
+          <div style="position:relative;height:260px;width:100%;">
+            <canvas id="summaryChart"></canvas>
+          </div>
 
           <div id="detailArea" style="margin-top:18px">
             <h4>Item Forecast</h4>
-            <canvas id="forecastChart" height="200"></canvas>
+            <div style="position:relative;height:200px;width:100%;">
+              <canvas id="forecastChart"></canvas>
+            </div>
             <div id="forecastNotes" class="msg info" style="display:none;margin-top:12px"></div>
           </div>
         </aside>
@@ -58,6 +67,7 @@
       <div id="po-result" style="margin-top:16px"></div>
     </main>
 
+    <script src="/js/auth.js"></script>
     <script src="/js/restock.js"></script>
   </body>
 </html>

@@ -15,8 +15,9 @@
     "name": "Spiral Notebook",
     "details": "200-page spiral bound notebook with ruled pages. Perfect for taking notes in class or meetings.",
     "category": "copy",
-    "quantity": 60,
+    "quantity": 8,
     "price": 35,
+    "reorderLevel": 50,
     "image": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcSR6b0fKNt9FO64ScsvNh8a5m1YRKYOfUEWZs7mG5k35h0loCxCuUxX-mf6N1dhFk7SXAjayp_6pQvp2iH3clKBwlVJSK1IgYOQrSGeZ7Us",
     "createdAt": "2025-01-01T00:00:00.000Z",
     "updatedAt": "2025-10-28T15:16:03.623Z"
@@ -26,8 +27,9 @@
     "name": "White Eraser",
     "details": "Soft white eraser that removes pencil marks cleanly without smudging. Non-toxic and latex-free.",
     "category": "eraser",
-    "quantity": 79,
+    "quantity": 5,
     "price": 12,
+    "reorderLevel": 30,
     "image": "https://images.meesho.com/images/products/446464644/9oj1h_512.avif?width=512",
     "createdAt": "2025-01-01T00:00:00.000Z",
     "updatedAt": "2025-11-30T18:02:56.000Z"
@@ -50,7 +52,8 @@
     "price": 399,
     "image": "https://th.bing.com/th/id/OPAC.t046v5I1BRnoPQ474C474?w=592&h=550&o=5&dpr=1.3&pid=21.1",
     "category": "pen",
-    "quantity": 14,
+    "quantity": 3,
+    "reorderLevel": 20,
     "createdAt": "2025-10-29T14:38:57.673Z",
     "updatedAt": "2025-10-29T14:38:57.673Z"
   },
@@ -72,7 +75,8 @@
     "price": 40,
     "image": "https://th.bing.com/th/id/OIP.4NVAhikLLa1Rl0J9x1b45AHaFm?w=242&h=183&c=7&r=0&o=7&dpr=1.3&pid=1.7&rm=3",
     "category": "pen",
-    "quantity": 4,
+    "quantity": 2,
+    "reorderLevel": 15,
     "createdAt": "2025-11-27T15:04:39.038Z",
     "updatedAt": "2025-11-27T15:04:39.038Z"
   }
