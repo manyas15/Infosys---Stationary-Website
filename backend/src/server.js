@@ -5,7 +5,10 @@ const path = require('path');
 const authRoutes = require('./routes/auth');
 const itemRoutes = require('./routes/items');
 const forecastRoutes = require('./routes/forecast');
+const debugRoutes = require('./routes/debug');
+const exportRoutes = require('./routes/exports');
 const transactionRoutes = require('./routes/transactions');
+const restockRoutes = require('./routes/restock');
 
 const app = express();
 const PORT = process.env.PORT || 4000;
@@ -29,7 +32,10 @@ app.get('/', (req, res) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/items', itemRoutes);
 app.use('/api/forecast', forecastRoutes);
+app.use('/api/debug', debugRoutes);
+app.use('/api/exports', exportRoutes);
 app.use('/api/transactions', transactionRoutes);
+app.use('/api/restock', restockRoutes);
 
 // Global 404
 app.use((req, res) => {

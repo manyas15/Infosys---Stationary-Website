@@ -16,12 +16,26 @@ function ensureFilesExist() {
 ensureFilesExist();
 
 function readJson(filePath) {
-  const raw = fs.readFileSync(filePath, 'utf-8');
-  return JSON.parse(raw || '[]');
+  try {
+    const raw = fs.readFileSync(filePath, 'utf-8');
+    return JSON.parse(raw || '[]');
+  } catch (err) {
+    console.error('readJson error for', filePath, err && err.message ? err.message : err);
+    // return empty array as a safe fallback
+    return [];
+  }
 }
 
 function writeJson(filePath, data) {
-  fs.writeFileSync(filePath, JSON.stringify(data, null, 2));
+  try {
+    // ensure directory exists
+    const dir = path.dirname(filePath);
+    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+    fs.writeFileSync(filePath, JSON.stringify(data, null, 2));
+  } catch (err) {
+    console.error('writeJson error for', filePath, err && err.stack ? err.stack : err);
+    throw err;
+  }
 }
 
 function getUsers() {

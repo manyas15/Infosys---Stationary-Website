@@ -1,0 +1,63 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Auto-Restock & Purchase Orders</title>
+    <link rel="stylesheet" href="/styles.css" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  </head>
+  <body>
+    <div class="container page-header">
+      <h1>Auto-Restock Suggestions</h1>
+      <p class="muted">Compute reorder recommendations and generate Purchase Orders quickly.</p>
+    </div>
+
+    <main class="container card">
+      <section class="kpi-grid">
+        <div class="kpi-card">
+          <div class="kpi-title">Total Inventory Value</div>
+          <div id="kpi-total-value" class="kpi-value">₹0</div>
+          <div class="kpi-muted">Value of all items in stock</div>
+        </div>
+        <div class="kpi-card warn">
+          <div class="kpi-title">Restock Needed (Value)</div>
+          <div id="kpi-restock-value" class="kpi-value">₹0</div>
+          <div class="kpi-muted">Estimated cost to restock suggested items</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-title">Low Stock Items</div>
+          <div id="kpi-low-count" class="kpi-value">0</div>
+          <div class="kpi-muted">Products below reorder level</div>
+        </div>
+      </section>
+
+      <div class="restock-grid">
+        <section class="restock-left">
+          <div style="display:flex;gap:12px;align-items:center;">
+            <button id="get-suggestions" class="submit-btn">Get Restock Suggestions</button>
+            <input id="po-supplier" placeholder="Supplier name" style="flex:1" />
+            <button id="create-po" class="submit-btn">Create PO for Selected</button>
+          </div>
+
+          <div id="suggestions-area" style="margin-top:16px;"></div>
+        </section>
+
+        <aside class="restock-right">
+          <h3>Overview</h3>
+          <canvas id="summaryChart" height="260"></canvas>
+
+          <div id="detailArea" style="margin-top:18px">
+            <h4>Item Forecast</h4>
+            <canvas id="forecastChart" height="200"></canvas>
+            <div id="forecastNotes" class="msg info" style="display:none;margin-top:12px"></div>
+          </div>
+        </aside>
+      </div>
+
+      <div id="po-result" style="margin-top:16px"></div>
+    </main>
+
+    <script src="/js/restock.js"></script>
+  </body>
+</html>

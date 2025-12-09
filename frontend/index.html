@@ -8,24 +8,31 @@
 </head>
 <body>
   <div class="container auth">
-    <h1>Stationery App</h1>
-    <div class="card">
+    <div class="login-hero">
+      <h1>Stationery App</h1>
+      <p class="muted">Inventory and purchase order management</p>
+    </div>
+    <div class="card login-card">
       <h2>Login</h2>
       <form id="loginForm">
-        <label>Email
-          <input type="email" id="loginEmail" required />
-        </label>
-        <label>Password
-          <input type="password" id="loginPassword" required />
-        </label>
-        <button type="submit">Login</button>
+        <div class="form-group">
+          <label>Email
+            <input type="email" id="loginEmail" required />
+          </label>
+          <label>Password
+            <input type="password" id="loginPassword" required />
+          </label>
+        </div>
+        <div class="login-actions">
+          <button type="submit" class="submit-btn">Login</button>
+          <a class="login-link" href="signup.html">Sign up</a>
+        </div>
       </form>
-      <p>No account? <a href="signup.html">Sign up</a></p>
       <p id="loginMsg" class="msg"></p>
     </div>
   </div>
   <script src="js/auth.js"></script>
-  <script>
+    <script>
     document.getElementById('loginForm').addEventListener('submit', async (e) => {
       e.preventDefault();
       const email = document.getElementById('loginEmail').value.trim();
@@ -34,8 +41,40 @@
       msg.textContent = '';
       try {
         const res = await login(email, password);
-        msg.textContent = 'Login successful! Redirecting…';
-        setTimeout(() => location.href = 'home.html', 500);
+        msg.textContent = 'Login successful! Verifying role…';
+        // call /api/auth/me to get authoritative user (in case stored user lacked role)
+        try {
+          const token = res.token;
+          const meResp = await fetch('/api/auth/me', { headers: { Authorization: 'Bearer ' + token } });
+          if (meResp.ok) {
+            const meJson = await meResp.json();
+            // update stored auth with fresh user
+            const stored = { token: token, user: meJson.user };
+            localStorage.setItem('auth', JSON.stringify(stored));
+            const role = (meJson.user && meJson.user.role) || 'user';
+            msg.textContent = 'Login successful! Redirecting…';
+            setTimeout(() => {
+              if (role === 'admin' || role === 'warehouse') location.href = 'admin.html';
+              else location.href = 'user.html';
+            }, 300);
+          } else {
+            // fallback to response user
+            const role = (res.user && res.user.role) || 'user';
+            msg.textContent = 'Login successful! Redirecting…';
+            setTimeout(() => {
+              if (role === 'admin' || role === 'warehouse') location.href = 'admin.html';
+              else location.href = 'user.html';
+            }, 300);
+          }
+        } catch (err) {
+          console.warn('Failed to verify /me', err);
+          const role = (res.user && res.user.role) || 'user';
+          msg.textContent = 'Login successful! Redirecting…';
+          setTimeout(() => {
+            if (role === 'admin' || role === 'warehouse') location.href = 'admin.html';
+            else location.href = 'user.html';
+          }, 300);
+        }
       } catch (err) {
         msg.textContent = err.message || 'Login failed';
       }

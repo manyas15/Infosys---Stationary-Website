@@ -38,8 +38,8 @@
             Role
             <select id="role" name="role" required>
               <option value="">Select Role</option>
-              <option>Admin</option>
-              <option>Store Manager</option>
+              <option value="admin">Admin</option>
+              <option value="user" selected>User</option>
             </select>
           </label>
           <label>
@@ -88,9 +88,14 @@
       };
 
       try {
-        await signup(payload);
-        msg.textContent = 'Signup successful! Redirecting to home…';
-        setTimeout(() => location.href = 'home.html', 600);
+        const res = await signup(payload);
+        msg.textContent = 'Signup successful! Redirecting…';
+        // redirect based on role assigned
+        const role = (res.user && res.user.role) || payload.role || 'user';
+        setTimeout(() => {
+          if (role === 'admin' || role === 'warehouse') location.href = 'admin.html';
+          else location.href = 'user.html';
+        }, 600);
       } catch (err) {
         msg.textContent = err.message || 'Signup failed';
       }

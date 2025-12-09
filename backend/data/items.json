@@ -4,11 +4,11 @@
     "name": "Mathematics Textbook",
     "details": "Comprehensive mathematics textbook covering algebra, geometry, and calculus. Suitable for high school students.",
     "category": "book",
-    "quantity": 32,
+    "quantity": 38,
     "price": 125,
     "image": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcRadXQT7MbENWurw-nu-ps-HbkPqfbCAFfWjUuw1o5sxC34UrPzYwStOtkt76q5TGcpFt2QQOHBhO0Q5rp1rvMENpsM88-2YuMnRJIagGs",
     "createdAt": "2025-01-01T00:00:00.000Z",
-    "updatedAt": "2025-11-11T14:46:08.034Z"
+    "updatedAt": "2025-11-30T17:52:03.699Z"
   },
   {
     "id": "seed-copy-1",
@@ -26,11 +26,11 @@
     "name": "White Eraser",
     "details": "Soft white eraser that removes pencil marks cleanly without smudging. Non-toxic and latex-free.",
     "category": "eraser",
-    "quantity": 80,
+    "quantity": 79,
     "price": 12,
     "image": "https://images.meesho.com/images/products/446464644/9oj1h_512.avif?width=512",
     "createdAt": "2025-01-01T00:00:00.000Z",
-    "updatedAt": "2025-10-28T15:12:16.287Z"
+    "updatedAt": "2025-11-30T18:02:56.000Z"
   },
   {
     "id": "seed-sharpener-1",
@@ -42,17 +42,6 @@
     "image": "https://m.media-amazon.com/images/I/71WggJOX12L.jpg",
     "createdAt": "2025-01-01T00:00:00.000Z",
     "updatedAt": "2025-10-28T15:15:33.373Z"
-  },
-  {
-    "id": "68000287-175f-4fe0-98ec-004ef521ba33",
-    "name": "Maxtron Pen",
-    "details": "Experience precision, speed, and style with the Rorito Maxtron Pen, designed to make every writing task effortless. Whether you’re taking notes, drafting documents, or sketching ideas, this pen combines cutting-edge technology with a sleek design to provide a superior writing experience.",
-    "price": 50,
-    "image": "https://www.roritoworld.com/wp-content/uploads/2022/11/png_20220423_103914_0000.png",
-    "category": "pen",
-    "quantity": 2,
-    "createdAt": "2025-10-28T15:11:09.185Z",
-    "updatedAt": "2025-10-28T15:11:09.185Z"
   },
   {
     "id": "b027a397-deab-42e5-bd30-406707ec465b",
@@ -75,5 +64,16 @@
     "quantity": 10,
     "createdAt": "2025-11-05T15:01:40.096Z",
     "updatedAt": "2025-11-05T15:01:40.096Z"
+  },
+  {
+    "id": "abae8525-43a1-462a-87ad-912f778dc80e",
+    "name": "pen",
+    "details": "parker",
+    "price": 40,
+    "image": "https://th.bing.com/th/id/OIP.4NVAhikLLa1Rl0J9x1b45AHaFm?w=242&h=183&c=7&r=0&o=7&dpr=1.3&pid=1.7&rm=3",
+    "category": "pen",
+    "quantity": 4,
+    "createdAt": "2025-11-27T15:04:39.038Z",
+    "updatedAt": "2025-11-27T15:04:39.038Z"
   }
 ]

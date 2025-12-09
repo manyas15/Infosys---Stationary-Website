@@ -5,17 +5,26 @@ Simple stationary store demo with a Node.js/Express backend and static frontend 
 ## Overview
 
 This repository contains a small full‑stack demo:
-- `backend/` — Express API that serves item data and handles authentication.
-- `frontend/` — Static HTML/CSS/JS pages (client uses the API).
+- `backend/` — Express API that serves item data, auth, transactions, restock suggestions, PO download, exports, and forecasts proxy.
+- `frontend/` — Static HTML/CSS/JS pages (login, product dashboard, admin dashboard, restock/PO, forecasts, exports).
 
-The backend can also serve the frontend statically so you can develop and run everything from one origin.
+The backend serves the frontend statically so you can develop and run everything from one origin.
+
+### Key features
+- Role-based login (admin/warehouse vs user) with JWT.
+- Product management dashboard (`home.html`) with Add/Update/Delete/Stock In-Out links.
+- Admin dashboard (`admin.html`) with KPIs, recent transactions, and download CSV/XLSX buttons.
+- Auto-Restock suggestions and Purchase Orders (`restock.html`) with CSV PO download.
+- Demand Forecast view (`forecast.html`) with fallback forecasts if the external service is down.
+- Transaction exports to CSV/XLSX.
 
 ## Tech stack
 
 - Node.js (>= 16 recommended)
 - Express
 - JSON files used as a lightweight data store
-- Frontend: plain HTML, CSS, and vanilla JavaScript
+- Frontend: plain HTML, CSS, and vanilla JavaScript + Chart.js for charts
+- (Optional) Forecast microservice (HTTP POST /predict at 127.0.0.1:5000) — fallback forecast is built-in if unavailable
 
 ## Quick start (Windows / cmd.exe)
 
@@ -34,7 +43,14 @@ npm start
 By default the server listens on port `4000`. Open http://localhost:4000 in your browser to view the frontend served by the backend.
 
 3. Open the frontend directly (alternative)
-- The frontend is static — you can open `frontend/index.html` directly in a browser, but some pages expect the API to be at `http://localhost:4000`. For full functionality serve the frontend via the backend (recommended).
+- You can open `frontend/index.html` directly in a browser, but most pages expect the API at `http://localhost:4000`. For full functionality serve the frontend via the backend (recommended).
+
+4. (Optional) Start the forecast service
+- The backend calls `http://127.0.0.1:5000/predict`. If you don’t run a forecast service, the backend uses a built-in fallback forecast.
+
+5. Login and navigate
+- Login at `http://localhost:4000/index.html`.
+- Admin/warehouse roles land on `admin.html` (includes downloads); users land on `user.html`. You can always open `home.html` for the product dashboard and `restock.html` for restock/PO.
 
 4. Using Stock In/Out
 - Login, open `home.html`, and click "Stock In / Out" to record transactions and view history.
@@ -58,7 +74,7 @@ Base URL: `http://localhost:4000/api`
 
 Auth
 - POST /api/auth/signup
-  - body: { "name": "...", "email": "...", "password": "..." }
+  - body: { "name": "...", "email": "...", "password": "...", "role": "admin|user" }
   - response: { token, user }
 - POST /api/auth/login
   - body: { "email": "...", "password": "..." }
@@ -106,6 +122,23 @@ curl -X POST http://localhost:4000/api/transactions/stock-in -H "Authorization: 
 
 :: Stock-out 2 units
 curl -X POST http://localhost:4000/api/transactions/stock-out -H "Authorization: Bearer %TOKEN%" -H "Content-Type: application/json" -d "{\"itemId\":\"<ITEM_ID>\",\"quantity\":2,\"notes\":\"invoice 987\"}"
+
+Restock & Purchase Orders
+- GET /api/restock/suggestions
+  - returns array of suggested items with suggestedQty (uses heuristic and fallback forecast)
+- POST /api/restock/po
+  - body: { supplier, lines: [{ id, name, qty, unitPrice? }] }
+  - response: { po }
+- GET /api/restock/po/:id/download
+  - downloads PO as CSV
+
+Forecast
+- GET /api/forecast?horizon=7
+  - calls external predictor at 127.0.0.1:5000/predict; falls back to local trend-based forecast
+
+Exports
+- GET /api/exports/transactions (auth) — CSV download
+- GET /api/exports/transactions/xlsx (auth) — Excel-friendly CSV with XLSX filename
 ```
 
 ## Project structure
@@ -126,17 +159,19 @@ curl -X POST http://localhost:4000/api/transactions/stock-out -H "Authorization:
 ## Development notes & edge cases
 
 - Data is stored in JSON files under `backend/data/` — concurrent writes are not safe for production.
-- Possible edge cases:
-  - Missing/invalid JWT -> 401 responses on protected endpoints.
-  - Empty or malformed request body -> 400 validation errors.
-  - Large requests or many concurrent writes -> data corruption risk when using file-based storage.
+- Missing/invalid JWT -> 401 on protected endpoints (items CRUD, transactions, exports).
+- Forecast service is optional: if offline, backend uses fallback and marks source as `fallback`.
+- Restock suggestions are heuristic; if none appear, check quantities vs reorderLevel and forecast sums (UI shows diagnostics when empty).
+- Exports require an auth token; 401 means login again.
 - Consider replacing JSON-backed storage with a real DB (SQLite/Postgres) for production.
 
 ## Troubleshooting
 
 - "Cannot fetch frontend resources / CORS" — run the backend (which serves the frontend) so the browser uses the same origin: `http://localhost:4000`.
-- If you get an error about JWT secret or invalid tokens, set `JWT_SECRET` before starting.
-- If `node` complains about experimental module interop for some dependency, upgrading Node to a newer stable LTS (Node 18+) usually resolves it.
+- Login/exports return 401 — ensure you are logged in and `localStorage.auth.token` exists; then retry.
+- No restock suggestions — open `restock.html` and view the diagnostics table (auto-shown when empty) to see qty vs forecast/reorder. Lower your reorderLevel or stock out an item to see suggestions.
+- Forecast flat line — ensure forecast service at 127.0.0.1:5000 is running; otherwise fallback is used.
+- Node experimental ESM warning for uuid — upgrade Node to latest LTS to suppress; harmless for dev.
 
 ## Tests / verification
 

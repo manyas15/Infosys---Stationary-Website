@@ -1,0 +1,54 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>User - Stationery</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="brand">Stationery</div>
+      <div class="spacer"></div>
+      <div id="userBox"></div>
+      <button id="logoutBtn" class="danger">Logout</button>
+    </header>
+
+    <main class="container">
+      <div class="welcome-section">
+        <h1>Products</h1>
+        <p class="muted">Browse and request items</p>
+      </div>
+
+      <section class="card">
+        <div id="userProducts" class="grid list"></div>
+      </section>
+    </main>
+
+    <script src="/js/auth.js"></script>
+    <script>
+      (function(){
+        const user = getCurrentUser();
+        document.getElementById('userBox').innerHTML = user ? `<strong>${user.name}</strong>` : '';
+        document.getElementById('logoutBtn').onclick = ()=>{ logout(); location.href='index.html' };
+
+        async function fetchItems(){ const r=await fetch('/api/items'); if(!r.ok) throw new Error('items'); return (await r.json()).items; }
+
+        function render(items){ const el=document.getElementById('userProducts'); el.innerHTML=''; items.forEach(it=>{ const d=document.createElement('div'); d.className='product-item'; d.innerHTML=`<div class='product-image'>${it.image?`<img src='${it.image}'/>`:'<i class="fas fa-box-open"></i>'}</div><div class='product-info'><h4>${it.name}</h4><p class='product-details'>${it.details||''}</p><div class='product-meta'><span>Qty: ${it.quantity}</span><span>Price: ₹${it.price}</span></div></div><div><button class='submit-btn' data-id='${it.id}'>Request</button></div>`; el.appendChild(d); });
+
+          // attach handlers
+          document.querySelectorAll('.product-item button').forEach(b=>b.addEventListener('click', async ()=>{
+            const id=b.dataset.id; const qty=1; // request 1
+            try{
+              const res = await fetch('/api/transactions/stock-out', { method:'POST', headers:{'Content-Type':'application/json','Authorization': `Bearer ${JSON.parse(localStorage.getItem('auth')||'{}').token}`}, body: JSON.stringify({ itemId:id, quantity: qty }) });
+              if(!res.ok) { const t=await res.json().catch(()=>({error:'failed'})); alert('Request failed: '+(t.error||'')); return; }
+              alert('Request placed');
+            }catch(e){ alert('Request error'); }
+          }));
+        }
+
+        (async function init(){ try{ const items = await fetchItems(); render(items); }catch(e){ console.error(e); } })();
+      })();
+    </script>
+  </body>
+</html>

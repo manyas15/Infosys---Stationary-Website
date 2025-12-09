@@ -1,44 +1,26 @@
 [
   {
-    "id": "0f7c1d86-7e82-484e-9e66-74f4a3265e44",
+    "id": "ce92f393-f43a-42f2-a0c5-40de4d8e16e4",
     "name": "Manya",
     "email": "manya@gmail.com",
-    "passwordHash": "$2b$10$lGZ5zWF37OPTWatKhi/dnOv6cYLqq2/44UM2zMGTAkEKginBwgcT6",
-    "createdAt": "2025-10-17T18:20:23.551Z"
+    "passwordHash": "$2b$10$6XCNjtMQ0RnJxt9GjfKcJObxhn7Fp/Ul9kHHsWjWkQl50NFxlMvAy",
+    "role": "admin",
+    "createdAt": "2025-11-30T20:48:57.579Z"
   },
   {
-    "id": "be6a9e2b-e8e7-4643-984e-b26eb7fb1186",
-    "name": "Manya Manya",
-    "email": "manyasachdeva60@gmail.com",
-    "passwordHash": "$2b$10$x4yfrDFTkkZGn14Tb6n.xe9ANBwjPP66x7P4F/AZojDULPw.p2c/m",
-    "createdAt": "2025-10-28T15:09:21.439Z"
+    "id": "5af80158-9b33-46b0-a90b-4d4ed94d4058",
+    "name": "Manya S",
+    "email": "manyas@gmail.com",
+    "passwordHash": "$2b$10$tUmyT6vmusY4tTuoi9OfQu8ra2D0iCkQZ.ge60fiNQ0BL.kw9gBf.",
+    "role": "user",
+    "createdAt": "2025-11-30T20:49:38.814Z"
   },
   {
-    "id": "e2f1376e-9af4-44dd-a8a1-f52455db5a02",
-    "name": "Manya s",
-    "email": "manyasachdeva6@gmail.com",
-    "passwordHash": "$2b$10$pBxdkUyJUdz0ZADz/keuxuClFn8jTUifsNDtyRBgSsa4uKfKGSl9O",
-    "createdAt": "2025-10-29T14:35:14.669Z"
-  },
-  {
-    "id": "f794779e-b982-4986-a3c7-5f6aac406c3c",
-    "name": "Manya Sachdeva",
-    "email": "manyasachdeva15@gmail.com",
-    "passwordHash": "$2b$10$93E112KmWwAyKKMcU.xIkuvsh0k32kiErv9u5L0iAPQuODXCs9RH2",
-    "createdAt": "2025-10-29T14:37:59.468Z"
-  },
-  {
-    "id": "76f124da-ee25-480c-9d4d-2e91a0ebf7b9",
-    "name": "manya",
-    "email": "manyasachdeva1512@gmail.com",
-    "passwordHash": "$2b$10$9ZPn/jyrPrZMEjXhKdGi7.yy7p38aRpbpc6Tdp6NPqTx2WE5GNVWm",
-    "createdAt": "2025-11-05T14:55:25.011Z"
-  },
-  {
-    "id": "41fab83a-7fe7-4008-b8f3-916f37f68447",
-    "name": "manya s",
-    "email": "manyasachdeva45@gmail.com",
-    "passwordHash": "$2b$10$AktgNxzZZI2Q1NlvDdb4IuQdz3FmNxRbhKa05Zpwi9352fwx67qZ.",
-    "createdAt": "2025-11-05T15:00:00.809Z"
+    "id": "3694c0b3-671e-4550-8c1c-6714bcdd9a4d",
+    "name": "Manya",
+    "email": "manya60@gmail.com",
+    "passwordHash": "$2b$10$wVF5mwwaB/ncRmd8uBn.4eQW99GyY9kir7lRdJW6H38TA4dRcdyHS",
+    "role": "admin",
+    "createdAt": "2025-12-08T15:10:49.572Z"
   }
 ]

@@ -1,0 +1,152 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Admin Dashboard - Stationery</title>
+    <link rel="stylesheet" href="/styles.css" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="brand">Stationery Admin</div>
+      <div class="spacer"></div>
+      <div id="userBox"></div>
+      <a id="goHomeBtn" class="submit-btn" href="home.html" style="margin-right:8px">Product Dashboard</a>
+      <button id="logoutBtn" class="danger">Logout</button>
+    </header>
+
+    <main class="container">
+      <div class="welcome-section">
+        <h1>Admin Dashboard</h1>
+        <p class="muted">Overview of inventory and auto-restock suggestions</p>
+      </div>
+
+      <section class="card">
+        <div class="kpi-grid">
+          <div class="kpi-card">
+            <div class="kpi-title">Total Inventory Value</div>
+            <div id="admin-total-value" class="kpi-value">₹0</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-title">Low Stock Items</div>
+            <div id="admin-low-count" class="kpi-value">0</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-title">Pending POs</div>
+            <div id="admin-po-count" class="kpi-value">0</div>
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 420px;gap:1.25rem;margin-top:1rem">
+          <div>
+            <h3>Top Restock Value</h3>
+            <canvas id="adminTopBar" height="240"></canvas>
+            <h3 style="margin-top:1rem">Inventory Breakdown</h3>
+            <canvas id="adminPie" height="200"></canvas>
+          </div>
+          <aside>
+            <h3>Recent Transactions</h3>
+            <div id="adminTxList"></div>
+            <div style="margin-top:12px">
+              <button id="downloadTxCsv" class="submit-btn">Download CSV</button>
+              <button id="downloadTxXlsx" class="submit-btn">Download Excel</button>
+            </div>
+          </aside>
+        </div>
+      </section>
+
+      <section class="card" style="margin-top:1.25rem">
+        <h3>Products (Admin)</h3>
+        <div id="adminProducts" class="grid list"></div>
+      </section>
+    </main>
+
+    <script src="/js/auth.js"></script>
+    <script>
+      (function(){
+        // Require login and admin role
+        guardAuth();
+        const user = getCurrentUser();
+        if (!user || !(user.role === 'admin' || user.role === 'warehouse')) {
+          // If logged in but not admin, send them to user page
+          location.href = 'user.html';
+          return;
+        }
+        document.getElementById('userBox').innerHTML = user ? `<strong>${user.name}</strong> (${user.role||'user'})` : '';
+        document.getElementById('logoutBtn').onclick = ()=>{ logout(); location.href='index.html' };
+
+        async function fetchItems(){ const r=await fetch('/api/items'); if(!r.ok) throw new Error('items'); return (await r.json()).items; }
+        async function fetchSuggestions(){ const r=await fetch('/api/restock/suggestions'); if(!r.ok) return {suggestions:[]}; return await r.json(); }
+        async function fetchTx(){ const r=await fetch('/api/transactions'); if(!r.ok) return {transactions:[]}; return (await r.json()).transactions; }
+
+        function renderProducts(items){ const el=document.getElementById('adminProducts'); el.innerHTML=''; items.forEach(it=>{ const d=document.createElement('div'); d.className='item'; d.innerHTML=`<div class="item-image">${it.image?`<img src='${it.image}'/>`:'<i class="fas fa-box-open"></i>'}</div><div class='item-content'><h4>${it.name}</h4><p class='item-details'>${it.details||''}</p><div class='item-meta'><span>SKU: ${it.id}</span><span>Qty: ${it.quantity}</span><span>Price: ₹${it.price}</span></div></div>`; el.appendChild(d); }); }
+
+        function createChart(ctx, type, data, options){ return new Chart(ctx,{type, data, options}); }
+
+        (async function init(){
+          try{
+            const items = await fetchItems();
+            renderProducts(items);
+            const suggestions = (await fetchSuggestions()).suggestions || [];
+            const totalValue = items.reduce((s,i)=>s+ (Number(i.quantity||0)*Number(i.price||0)),0);
+            document.getElementById('admin-total-value').textContent = `₹${totalValue.toLocaleString()}`;
+            document.getElementById('admin-low-count').textContent = `${suggestions.length}`;
+            // top bar
+            const bars = suggestions.map(s=>({name:s.name, value: Number(s.suggestedQty||0)*(items.find(it=> (it.id==s.id) )?.price||0)})).sort((a,b)=>b.value-a.value).slice(0,8);
+            const ctx = document.getElementById('adminTopBar').getContext('2d');
+            createChart(ctx,'bar',{labels:bars.map(b=>b.name),datasets:[{label:'Restock value',data:bars.map(b=>b.value),backgroundColor:'rgba(99,102,241,0.9)'}]},{responsive:true,maintainAspectRatio:false});
+            const pie = document.getElementById('adminPie').getContext('2d');
+            const catMap = {};
+            items.forEach(i=>{catMap[i.category]=(catMap[i.category]||0)+(Number(i.quantity||0)*Number(i.price||0))});
+            createChart(pie,'doughnut',{labels:Object.keys(catMap),datasets:[{data:Object.values(catMap),backgroundColor:['#60a5fa','#f97316','#34d399','#f472b6','#a78bfa']}]},{responsive:true,maintainAspectRatio:false});
+
+            // transactions
+            const txs = await fetchTx();
+            const txList = document.getElementById('adminTxList'); txList.innerHTML='';
+            txs.slice(0,8).forEach(t=>{ const div=document.createElement('div'); div.className='product-item'; div.innerHTML = `<div class='product-info'><h4>${t.itemName}</h4><p class='product-details'>${t.type} • ${t.quantity} • ${new Date(t.createdAt).toLocaleString()}</p></div>`; txList.appendChild(div);});
+
+            document.getElementById('downloadTxCsv').onclick = async () => {
+              try {
+                const token = getAuthToken();
+                if (!token) return alert('Please login first');
+                const resp = await fetch('/api/exports/transactions?from=&to=', { headers: { Authorization: 'Bearer ' + token } });
+                if (!resp.ok) return alert('Export failed: ' + (await resp.text()));
+                const blob = await resp.blob();
+                const cd = resp.headers.get('Content-Disposition') || '';
+                let fname = 'transactions.csv';
+                const m = cd.match(/filename="?([^";]+)"?/);
+                if (m) fname = m[1];
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a'); a.href = url; a.download = fname; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+              } catch (err) { console.error(err); alert('Download failed: ' + err.message); }
+            };
+
+            document.getElementById('downloadTxXlsx').onclick = async () => {
+              try {
+                const token = getAuthToken();
+                if (!token) return alert('Please login first');
+                const resp = await fetch('/api/exports/transactions/xlsx?from=&to=', { headers: { Authorization: 'Bearer ' + token } });
+                if (!resp.ok) {
+                  const txt = await resp.text().catch(()=> '');
+                  // fallback to direct navigation if browser may handle download differently
+                  if (resp.status === 401) return alert('Unauthorized — please login again');
+                  return alert('Export failed: ' + txt);
+                }
+                const blob = await resp.blob();
+                const cd = resp.headers.get('Content-Disposition') || '';
+                let fname = 'transactions.xlsx';
+                const m = cd.match(/filename="?([^";]+)"?/);
+                if (m) fname = m[1];
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a'); a.href = url; a.download = fname; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+              } catch (err) { console.error(err); alert('Download failed: ' + err.message); }
+            };
+
+          }catch(e){ console.error(e); }
+        })();
+
+      })();
+    </script>
+  </body>
+</html>

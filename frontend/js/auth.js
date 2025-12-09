@@ -6,7 +6,7 @@ async function signup(nameOrPayload, email, password){
     ? nameOrPayload
     : { name: nameOrPayload, email, password };
 
-  const res = await fetch('http://localhost:4000/api/auth/signup', {
+  const res = await fetch('/api/auth/signup', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(payload)
@@ -18,7 +18,7 @@ async function signup(nameOrPayload, email, password){
 }
 
 async function login(email, password){
-  const res = await fetch('http://localhost:4000/api/auth/login', {
+  const res = await fetch('/api/auth/login', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ email, password })
@@ -38,6 +38,10 @@ function logout(){ localStorage.removeItem('auth'); }
 function guardAuth(){
   const token = (function(){ try { return JSON.parse(localStorage.getItem('auth')||'{}').token; } catch { return null; } })();
   if (!token) location.href = 'index.html';
+}
+
+function getAuthToken(){
+  try { return JSON.parse(localStorage.getItem('auth')||'{}').token || null; } catch { return null; }
 }
 
 
